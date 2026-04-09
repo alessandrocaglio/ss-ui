@@ -59,7 +59,7 @@ helm upgrade --install ss-ui ./charts/ss-ui \
 
 You can run `ss-ui` seamlessly on your local machine using either Podman or Docker Compose. This is ideal if you want to generate Sealed Secrets without installing `kubeseal`.
 
-### Option 1: Running with Podman (Recommended for Linux/Red Hat)
+### Option 1: Running with Podman
 
 By default, the container will start fresh. You can upload any public certificate `.pem` file directly via the browser UI!
 
@@ -83,32 +83,47 @@ podman run -d \
 ```
 *Navigate to [http://localhost:8080](http://localhost:8080) to access the application.*
 
-### Option 2: Running with Podman Compose
+### Option 2: Running with Pre-built Binaries
 
-If you use Podman Desktop or Podman Compose, we provide a pre-configured architecture.
+If you prefer to run a single binary without any container runtime, you can download the versioned assets for **Linux**, **macOS**, or **Windows** from the [GitHub Releases](https://github.com/alessandrocaglio/ss-ui/releases) page.
 
-First, create a `podman-compose.yml` file:
-```yaml
-version: '3.8'
+1.  **Download** the archive for your platform.
+2.  **Extract** the `ss-ui` binary.
+3.  **Execute** it directly:
 
-services:
-  ss-ui:
-    image: quay.io/acaglio/ss-ui:latest
-    ports:
-      - "8080:8080"
-    environment:
-      # Optional: Maps a local certificate if mounted
-      - CERT_FILE=/app/cert.pem
-    volumes:
-      # Optional: Mounts a public cert into the container natively
-      - ./dev/test-cert.pem:/app/cert.pem
-```
-
-Launch the service in the background:
+Example:
 ```bash
-podman-compose up -d
+ss-ui --cert-file dev/test-cert.pem --port=9090
 ```
-*Navigate to [http://localhost:8080](http://localhost:8080) to access the application.*
+
+**Full Help Output:**
+```text
+Usage of ss-ui:
+  -allowed-origins string
+    	CORS allowed origins (comma separated) (default "*")
+  -cert-cache-ttl duration
+    	TTL for cached certificates fetched from the Controller (default 1h0m0s)
+  -cert-file string
+    	Path to a PEM certificate to pre-load (File source)
+  -cert-url string
+    	Direct URL to fetch the certificate from (Controller source)
+  -controller-name string
+    	Name of the in-cluster sealed-secrets service (default "sealed-secrets")
+  -controller-namespace string
+    	Namespace of the in-cluster sealed-secrets service (default "kube-system")
+  -kubeconfig string
+    	Path to kubeconfig file
+  -log-level string
+    	Log level (debug, info, warn, error) (default "info")
+  -port string
+    	Port to listen on (default "8080")
+  -read-timeout duration
+    	HTTP read timeout (default 10s)
+  -write-timeout duration
+    	HTTP write timeout (default 30s)
+```
+
+*Note: The binary includes the embedded frontend, so no extra files are needed to serve the UI.*
 
 ---
 
