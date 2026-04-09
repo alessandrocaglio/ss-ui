@@ -1,0 +1,28 @@
+# Node & Frontend Dependencies
+node_modules/
+dist/
+dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Go & Embedded Artefacts
+/ss-ui
+/sealed-secret-manager
+backend/cmd/server/frontend/
+backend/server.log
+
+# Local Development Keys
+/dev/
+
+# IDE & OS Specific
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment Variables
+.env
+.env.*
