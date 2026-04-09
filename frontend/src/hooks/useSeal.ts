@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { sealSecret } from "../lib/api";
-import type { SealRequest, SealResponse } from "../types/api";
+import type { SealRequest, SealResponse, ApiError } from "../types/api";
 import { toast } from "sonner";
 
 export function useSeal() {
@@ -16,8 +16,9 @@ export function useSeal() {
       setSealResult(res);
       toast.success("Sealed Secret generated successfully");
     } catch (err: unknown) {
-      setError(err?.error?.message || "Failed to generate sealed secret");
-      toast.error(err?.error?.message || "Failed to generate sealed secret");
+      const apiErr = err as ApiError;
+      setError(apiErr?.error?.message || "Failed to generate sealed secret");
+      toast.error(apiErr?.error?.message || "Failed to generate sealed secret");
     } finally {
       setLoading(false);
     }

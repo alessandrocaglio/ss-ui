@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import type { CertInfo, CertSource } from "../types/api";
+import type { CertInfo, CertSource, ApiError } from "../types/api";
 import { fetchCert, switchCertSource, uploadCert } from "../lib/api";
 import { toast } from "sonner";
 
@@ -15,7 +15,8 @@ export function useCert() {
       setCertInfo(data);
       setError(null);
     } catch (err: unknown) {
-      setError(err?.error?.message || "Failed to fetch active certificate");
+      const apiErr = err as ApiError;
+      setError(apiErr?.error?.message || "Failed to fetch active certificate");
       setCertInfo(null);
     } finally {
       setLoading(false);
@@ -32,7 +33,8 @@ export function useCert() {
       await refreshCert();
       toast.success(`Switched to ${source} certificate`);
     } catch (err: unknown) {
-      toast.error(err?.error?.message || "Failed to switch source");
+      const apiErr = err as ApiError;
+      toast.error(apiErr?.error?.message || "Failed to switch source");
     }
   };
 
@@ -42,7 +44,8 @@ export function useCert() {
       await refreshCert();
       toast.success("Certificate uploaded successfully");
     } catch (err: unknown) {
-      toast.error(err?.error?.message || "Failed to upload certificate");
+      const apiErr = err as ApiError;
+      toast.error(apiErr?.error?.message || "Failed to upload certificate");
     }
   };
 
