@@ -1,6 +1,13 @@
 # Sealed Secret UI (`ss-ui`)
 
-**ss-ui** is a robust, full-stack web application designed for OpenShift and Kubernetes operators. It provides a graphical interface equivalent to the native OpenShift "Create Secret" form, allowing you to securely construct `SealedSecret` manifests directly through a browser UI without relying entirely on the `kubeseal` CLI. 
+![CI](https://github.com/alessandrocaglio/ss-ui/workflows/CI/badge.svg)
+![Release](https://img.shields.io/github/v/release/alessandrocaglio/ss-ui)
+![Go Version](https://img.shields.io/badge/Go-1.26-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+**ss-ui** is a robust, full-stack web application designed for OpenShift and Kubernetes operators. It provides a graphical interface equivalent to the native OpenShift "Create Secret" form, allowing you to securely construct `SealedSecret` manifests directly through a browser UI without relying entirely on the `kubeseal` CLI.
+
+![Application Screenshot](assets/screenshot.png)
 
 This application guarantees completely stateless execution – no secrets are persistently logged, cached, or sent anywhere except straight out the browser in bit-perfect Bitnami encrypted YAML structures.
 
