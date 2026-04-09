@@ -1,4 +1,4 @@
-.PHONY: dev build test lint docker docker-push deploy gen-test-cert
+.PHONY: dev build test lint docker container-push deploy gen-test-cert
 
 VERSION ?= latest
 REGISTRY ?= quay.io/acaglio
@@ -30,9 +30,9 @@ lint:
 
 docker:
 	@echo "Building image $(IMAGE)..."
-	@docker build -t $(IMAGE) -f backend/Dockerfile .
+	@docker build -t $(IMAGE) -f backend/Containerfile .
 
-docker-push:
+container-push:
 	@echo "Pushing image to $(IMAGE)..."
 	@docker push $(IMAGE)
 

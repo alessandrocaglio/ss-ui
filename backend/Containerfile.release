@@ -1,0 +1,13 @@
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+LABEL maintainer="Alessandro Caglio"
+LABEL description="Sealed Secret UI - Production Release Image"
+
+WORKDIR /app
+# GoReleaser will provide the binary in the same directory
+COPY ss-ui /app/ss-ui
+
+RUN chmod +x /app/ss-ui
+USER 1001
+
+EXPOSE 8080
+ENTRYPOINT ["/app/ss-ui"]

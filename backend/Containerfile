@@ -17,8 +17,17 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-s -w -X main.version=${VERSION:-dev}" \
     -o /ss-ui ./cmd/server
 
-# Stage 3 -- Runtime
-FROM gcr.io/distroless/static-debian12:nonroot
-COPY --from=backend-builder /ss-ui /ss-ui
+# Stage 3 -- Runtime (Red Hat UBI)
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+LABEL maintainer="Alessandro Caglio"
+LABEL description="Sealed Secret UI - Production Image"
+
+WORKDIR /app
+COPY --from=backend-builder /ss-ui /app/ss-ui
+
+# Ensure the binary is executable and use a non-root UID for OpenShift compatibility
+RUN chmod +x /app/ss-ui
+USER 1001
+
 EXPOSE 8080
-ENTRYPOINT ["/ss-ui"]
+ENTRYPOINT ["/app/ss-ui"]
