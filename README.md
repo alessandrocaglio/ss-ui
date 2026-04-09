@@ -63,31 +63,44 @@ docker-compose up -d
 
 ---
 
-## ☸️ How to Deploy on Kubernetes / OpenShift
+## ☸️ Cluster Deployment (Helm)
 
-Deploying `ss-ui` natively into your cluster is the most powerful way to use it! When running inside OpenShift, `ss-ui` will dynamically resolve the cluster's Sealed Secrets API service automatically and utilize its certificates without requiring you to manually download or mount `.pem` files.
+The recommended way to deploy `ss-ui` to Kubernetes or OpenShift is using the provided **Helm Chart**. This handles resource creation (Deployment, Service, ServiceAccount) and automatically manages OpenShift **Routes** or standard **Ingress** based on your configuration.
 
-Deploying is as simple as applying the pre-packaged manifests mapping the Deployment, Service, ServiceAccount, and Route:
+### Installation
 
 ```bash
-kubectl apply -f deploy/
+# Install the chart from the local directory
+helm upgrade --install ss-ui ./charts/ss-ui \
+  --namespace ss-ui --create-namespace \
+  --set env.allowedOrigins="https://ss-ui.myapp.com"
 ```
 
-This creates an OpenShift `Route`. You can retrieve your newly generated GUI web address immediately using:
+### Configuration Reference
+
+All configurations are managed via `values.yaml`. You can override them using `--set key=value` or by providing a custom file with `-f custom-values.yaml`.
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `replicaCount` | Number of pods to run | `1` |
+| `image.repository` | App image repository | `quay.io/acaglio/ss-ui` |
+| `image.tag` | App image tag | `latest` |
+| `openshift.route.enabled` | Create an OpenShift Route | `true` |
+| `openshift.route.host` | Custom domain for the Route (optional) | `""` |
+| `ingress.enabled` | Create a standard K8s Ingress | `false` |
+| `env.controllerNamespace` | Namespace of Sealed Secrets controller | `kube-system` |
+| `env.controllerName` | Service name of Sealed Secrets controller | `sealed-secrets` |
+| `env.allowedOrigins` | CORS policy for API | `*` |
+| `resources.limits.memory` | Memory limit for the backend | `128Mi` |
+
+### Advanced: Targeting a non-standard Controller
+
+If your Bitnami Sealed Secrets controller is not in `kube-system`, simply update the environment variables via Helm:
+
 ```bash
-oc get route ss-ui
-```
-
-### Advanced Cluster Configuration
-
-If you didn't install the Bitnami `sealed-secrets` controller into the default `kube-system` namespace, you can instruct `ss-ui` where to find it by updating the environment variables mapped inside your `deployment.yaml`:
-
-```yaml
-          env:
-            - name: CONTROLLER_NAMESPACE
-              value: "my-custom-namespace"  # Update to where your Bitnami controller is installed
-            - name: CONTROLLER_NAME
-              value: "sealed-secrets"       # Only needed if the pod controller name is different
+helm upgrade --install ss-ui ./charts/ss-ui \
+  --set env.controllerNamespace="custom-sealed-secrets-ns" \
+  --set env.controllerName="my-controller-service"
 ```
 
 ---

@@ -1,0 +1,20 @@
+{{- if .Values.openshift.route.enabled -}}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "ss-ui.fullname" . }}
+  labels:
+    {{- include "ss-ui.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.openshift.route.host }}
+  host: {{ .Values.openshift.route.host | quote }}
+  {{- end }}
+  to:
+    kind: Service
+    name: {{ include "ss-ui.fullname" . }}
+  port:
+    targetPort: http
+  tls:
+    termination: {{ .Values.openshift.route.termination }}
+    insecureEdgeTerminationPolicy: Redirect
+{{- end }}

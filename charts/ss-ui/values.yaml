@@ -1,0 +1,69 @@
+replicaCount: 1
+
+image:
+  repository: quay.io/acaglio/ss-ui
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: ss-ui.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+openshift:
+  route:
+    enabled: true
+    host: ""
+    termination: edge
+
+env:
+  controllerNamespace: "kube-system"
+  controllerName: "sealed-secrets"
+  allowedOrigins: "*"
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
