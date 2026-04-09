@@ -63,28 +63,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOTOOLCHAIN: local
-
-      - name: Update CHANGELOG.md
-        run: |
-          VERSION="${{ github.ref_name }}"
-          DATE=$(date +%Y-%m-%d)
-          
-          # Get changelog content from goreleaser output or generate a summary
-          echo -e "# Changelog\n\n## $VERSION ($DATE)\n" > NEW_CHANGELOG.md
-          
-          # Use git log to get changes since last tag if goreleaser output isn't easily accessible
-          git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --oneline --pretty=format:"* %s" >> NEW_CHANGELOG.md
-          echo -e "\n" >> NEW_CHANGELOG.md
-          
-          if [ -f CHANGELOG.md ]; then
-            # Strip the header if it exists and append old changelog
-            tail -n +2 CHANGELOG.md >> NEW_CHANGELOG.md
-          fi
-          
-          mv NEW_CHANGELOG.md CHANGELOG.md
-
-      - name: Commit CHANGELOG.md
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]"
-          file_pattern: 'CHANGELOG.md'

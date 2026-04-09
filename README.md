@@ -111,3 +111,9 @@ helm upgrade --install ss-ui ./charts/ss-ui \
 *   **Customizable Metadata**: Add arbitrary Kubernetes labels and annotations to any secret via dynamic key-value builders in the UI.
 *   **GitOps Toggle Logic**: Need to render standard secrets into a flat-structured custom list for your GitOps configurations? Instantly flip the radio button under the output code editor to convert conventional `bitnami.com/v1alpha1` manifests entirely! The helper format preserves your custom labels and annotations automatically.
 *   **Raw YAML Fallbacks**: Need to port over huge chunks of old code? Paste native unencrypted Kubernetes `kind: Secret` YAMLs right into the dashboard and let the frontend automatically parse and safely bridge them for you directly on the fly.
+
+---
+
+## 📜 Releases & Changelog
+
+This project follows **Conventional Commits**. For a detailed history of changes and to download specific versions, please visit the [GitHub Releases](https://github.com/alessandrocaglio/ss-ui/releases) page.
