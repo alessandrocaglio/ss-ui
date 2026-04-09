@@ -14,7 +14,7 @@ export function useCert() {
       const data = await fetchCert();
       setCertInfo(data);
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err?.error?.message || "Failed to fetch active certificate");
       setCertInfo(null);
     } finally {
@@ -31,7 +31,7 @@ export function useCert() {
       await switchCertSource(source);
       await refreshCert();
       toast.success(`Switched to ${source} certificate`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error(err?.error?.message || "Failed to switch source");
     }
   };
@@ -41,7 +41,7 @@ export function useCert() {
       await uploadCert(fileOrString);
       await refreshCert();
       toast.success("Certificate uploaded successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error(err?.error?.message || "Failed to upload certificate");
     }
   };

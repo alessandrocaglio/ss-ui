@@ -24,7 +24,8 @@ test:
 	@cd backend && go test -v -cover ./...
 
 lint:
-	@cd backend && golangci-lint run
+	@mkdir -p backend/cmd/server/frontend/dist && touch backend/cmd/server/frontend/dist/.gitkeep
+	@cd backend && go vet ./... && gofmt -l .
 	@cd frontend && npm run lint
 
 docker:

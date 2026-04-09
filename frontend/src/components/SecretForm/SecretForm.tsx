@@ -137,7 +137,7 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
 
             <div className="space-y-1">
               <label className="text-sm font-medium">Sealing Scope</label>
-              <select className="w-full p-2 border rounded text-sm outline-none" value={scope} onChange={e=>setScope(e.target.value as any)}>
+              <select className="w-full p-2 border rounded text-sm outline-none" value={scope} onChange={e=>setScope(e.target.value as "strict" | "namespace-wide" | "cluster-wide")}>
                 <option value="strict">Strict (Bound to exact name + namespace)</option>
                 <option value="namespace-wide">Namespace-wide</option>
                 <option value="cluster-wide">Cluster-wide</option>

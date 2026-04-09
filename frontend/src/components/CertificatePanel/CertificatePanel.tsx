@@ -14,9 +14,9 @@ export function CertificatePanel({ certInfo, switchSource, uploadCertText }: Pro
 
   useEffect(() => {
     if (certInfo && certInfo.source !== "none") {
-      setActiveTab(certInfo.source);
+      setTimeout(() => setActiveTab(certInfo.source), 0);
     }
-  }, [certInfo?.source]);
+  }, [certInfo, certInfo?.source]);
 
   const isAvail = (src: CertSource) => certInfo?.availableSources.includes(src);
 

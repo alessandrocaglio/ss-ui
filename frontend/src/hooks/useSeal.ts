@@ -15,7 +15,7 @@ export function useSeal() {
       const res = await sealSecret(req);
       setSealResult(res);
       toast.success("Sealed Secret generated successfully");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err?.error?.message || "Failed to generate sealed secret");
       toast.error(err?.error?.message || "Failed to generate sealed secret");
     } finally {

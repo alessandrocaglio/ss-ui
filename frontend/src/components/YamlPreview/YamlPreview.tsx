@@ -8,7 +8,7 @@ export function YamlPreview({ sealResult, loading, theme }: { sealResult: SealRe
   const [format, setFormat] = useState<"sealed" | "gitops">("sealed");
 
   let displayYaml = sealResult?.yaml || "";
-  let displayFilename = sealResult?.filename || "";
+  const displayFilename = sealResult?.filename || "";
 
   if (format === "gitops" && sealResult?.encryptedData) {
     const lines = [`- name: ${sealResult.name || "sealed-secret"}`];

@@ -1,3 +1,5 @@
+import { SealRequest } from "../types/api";
+
 export const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
 
 export async function fetchCert() {
@@ -18,7 +20,7 @@ export async function switchCertSource(source: string) {
 
 export async function uploadCert(pemFile: File | string) {
   let body: BodyInit;
-  let headers: Record<string, string> = {};
+  const headers: Record<string, string> = {};
 
   if (typeof pemFile === "string") {
     body = pemFile;
@@ -38,7 +40,7 @@ export async function uploadCert(pemFile: File | string) {
   return res.json();
 }
 
-export async function sealSecret(payload: any) {
+export async function sealSecret(payload: SealRequest) {
   const res = await fetch(`${API_BASE}/seal`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
