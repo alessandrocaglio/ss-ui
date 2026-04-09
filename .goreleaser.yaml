@@ -3,12 +3,13 @@ version: 2
 
 before:
   hooks:
-    - go mod tidy
+    - bash -c "cd backend && go mod tidy"
     # The frontend is built by the GHA workflow before running goreleaser
 
 builds:
   - id: ss-ui
-    main: ./backend/cmd/server
+    dir: backend
+    main: ./cmd/server
     binary: ss-ui
     env:
       - CGO_ENABLED=0
@@ -32,7 +33,7 @@ archives:
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
 
 dockers:
   - image_templates:
