@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { SealRequest } from "../../types/api";
+import { ChevronDown, ChevronRight, X, Plus } from "lucide-react";
 
 interface Props {
   onGenerate: (req: SealRequest) => void;
@@ -17,6 +18,10 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
   const [scope, setScope] = useState<"strict" | "namespace-wide" | "cluster-wide">("strict");
 
   const [kvPairs, setKvPairs] = useState([{ key: "", value: "" }]);
+
+  const [labelPairs, setLabelPairs] = useState<{key: string, value: string}[]>([]);
+  const [annotationPairs, setAnnotationPairs] = useState<{key: string, value: string}[]>([]);
+  const [showMetadataExtras, setShowMetadataExtras] = useState(false);
   
   // Specialized types
   const [dockerUser, setDockerUser] = useState("");
@@ -76,6 +81,17 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
 
     const data: Record<string, string> = {};
     const annotations: Record<string, string> = {};
+    const labels: Record<string, string> = {};
+
+    // Process custom labels
+    labelPairs.forEach(p => {
+      if (p.key) labels[p.key] = p.value;
+    });
+
+    // Process custom annotations
+    annotationPairs.forEach(p => {
+      if (p.key) annotations[p.key] = p.value;
+    });
 
     if (type === "Opaque") {
       kvPairs.forEach(kv => {
@@ -108,7 +124,7 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
     }
     
     onGenerate({
-      name, namespace, type, scope, data, annotations
+      name, namespace, type, scope, data, annotations, labels
     });
   };
 
@@ -152,6 +168,65 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
                 <label className="text-sm font-medium">Namespace</label>
                 <input required className="w-full p-2 border rounded text-sm focus:ring-1 outline-none" value={namespace} onChange={e=>setNamespace(e.target.value)} placeholder="default" />
               </div>
+            </div>
+
+            <div className="border rounded-md overflow-hidden">
+               <button 
+                 type="button"
+                 onClick={() => setShowMetadataExtras(!showMetadataExtras)}
+                 className="w-full flex items-center justify-between px-3 py-2 bg-muted/20 hover:bg-muted/40 transition-colors text-sm font-medium"
+               >
+                 <span>Labels & Annotations</span>
+                 {showMetadataExtras ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+               </button>
+               
+               {showMetadataExtras && (
+                 <div className="p-3 space-y-4 bg-background">
+                    <div className="space-y-2">
+                       <label className="text-xs font-semibold text-muted-foreground uppercase">Labels</label>
+                       {labelPairs.map((lp, i) => (
+                         <div key={i} className="flex gap-2">
+                            <input className="flex-1 p-1.5 border rounded text-xs" placeholder="key" value={lp.key} onChange={e => {
+                               const next = [...labelPairs];
+                               next[i].key = e.target.value;
+                               setLabelPairs(next);
+                            }} />
+                            <input className="flex-1 p-1.5 border rounded text-xs" placeholder="value" value={lp.value} onChange={e => {
+                               const next = [...labelPairs];
+                               next[i].value = e.target.value;
+                               setLabelPairs(next);
+                            }} />
+                            <button type="button" onClick={() => setLabelPairs(labelPairs.filter((_, idx) => idx !== i))} className="text-destructive"><X size={14}/></button>
+                         </div>
+                       ))}
+                       <button type="button" onClick={() => setLabelPairs([...labelPairs, {key:"", value:""}])} className="text-xs text-primary font-medium flex items-center gap-1 hover:underline">
+                         <Plus size={12}/> Add Label
+                       </button>
+                    </div>
+
+                    <div className="space-y-2 pt-2 border-t">
+                       <label className="text-xs font-semibold text-muted-foreground uppercase">Annotations</label>
+                       {annotationPairs.map((ap, i) => (
+                         <div key={i} className="flex gap-2">
+                            <input className="flex-1 p-1.5 border rounded text-xs" placeholder="key" value={ap.key} onChange={e => {
+                               const next = [...annotationPairs];
+                               next[i].key = e.target.value;
+                               setAnnotationPairs(next);
+                            }} />
+                            <input className="flex-1 p-1.5 border rounded text-xs" placeholder="value" value={ap.value} onChange={e => {
+                               const next = [...annotationPairs];
+                               next[i].value = e.target.value;
+                               setAnnotationPairs(next);
+                            }} />
+                            <button type="button" onClick={() => setAnnotationPairs(annotationPairs.filter((_, idx) => idx !== i))} className="text-destructive"><X size={14}/></button>
+                         </div>
+                       ))}
+                       <button type="button" onClick={() => setAnnotationPairs([...annotationPairs, {key:"", value:""}])} className="text-xs text-primary font-medium flex items-center gap-1 hover:underline">
+                         <Plus size={12}/> Add Annotation
+                       </button>
+                    </div>
+                 </div>
+               )}
             </div>
 
             <div className="space-y-1">

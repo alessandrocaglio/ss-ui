@@ -12,9 +12,24 @@ export function YamlPreview({ sealResult, loading, theme }: { sealResult: SealRe
 
   if (format === "gitops" && sealResult?.encryptedData) {
     const lines = [`- name: ${sealResult.name || "sealed-secret"}`];
+    
+    if (sealResult.labels && Object.keys(sealResult.labels).length > 0) {
+      lines.push("  labels:");
+      for (const [k, v] of Object.entries(sealResult.labels)) {
+        lines.push(`    ${k}: ${v}`);
+      }
+    }
+
+    if (sealResult.annotations && Object.keys(sealResult.annotations).length > 0) {
+      lines.push("  annotations:");
+      for (const [k, v] of Object.entries(sealResult.annotations)) {
+        lines.push(`    ${k}: ${v}`);
+      }
+    }
+
     lines.push("  data:");
     for (const [k, v] of Object.entries(sealResult.encryptedData)) {
-      lines.push(`     ${k}: ${v}`);
+      lines.push(`    ${k}: ${v}`);
     }
     displayYaml = lines.join("\n");
   }

@@ -78,6 +78,8 @@ func (h *SealHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"yaml":          string(yamlOutput),
 		"filename":      filename,
 		"name":          req.Name,
+		"labels":        req.Labels,
+		"annotations":   req.Annotations,
 		"encryptedData": encryptedData,
 	})
 }

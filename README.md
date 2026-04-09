@@ -95,5 +95,6 @@ If you didn't install the Bitnami `sealed-secrets` controller into the default `
 ## 🌟 Application Features & Usage
 
 *   **Zero-State Security Model**: Secrets are instantly processed, structured, and wiped. Uploaded PEM certificates never touch the disk and live entirely in-memory.
-*   **GitOps Toggle Logic**: Need to render standard secrets into a flat-structured custom list for your GitOps configurations? Instantly flip the radio button under the output code editor to convert conventional `bitnami.com/v1alpha1` manifests entirely!
+*   **Customizable Metadata**: Add arbitrary Kubernetes labels and annotations to any secret via dynamic key-value builders in the UI.
+*   **GitOps Toggle Logic**: Need to render standard secrets into a flat-structured custom list for your GitOps configurations? Instantly flip the radio button under the output code editor to convert conventional `bitnami.com/v1alpha1` manifests entirely! The helper format preserves your custom labels and annotations automatically.
 *   **Raw YAML Fallbacks**: Need to port over huge chunks of old code? Paste native unencrypted Kubernetes `kind: Secret` YAMLs right into the dashboard and let the frontend automatically parse and safely bridge them for you directly on the fly.

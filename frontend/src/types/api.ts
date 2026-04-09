@@ -23,6 +23,8 @@ export interface SealResponse {
   yaml: string;
   filename: string;
   name?: string;
+  labels?: Record<string, string>;
+  annotations?: Record<string, string>;
   encryptedData?: Record<string, string>;
 }
 
