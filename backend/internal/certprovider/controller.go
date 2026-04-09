@@ -16,12 +16,12 @@ import (
 var ErrCertFetchFailed = errors.New("failed to fetch certificate from controller")
 
 type ControllerProvider struct {
-	mu           sync.RWMutex
-	url          string
-	cacheTTL     time.Duration
-	cert         *x509.Certificate
-	pem          []byte
-	lastFetch    time.Time
+	mu        sync.RWMutex
+	url       string
+	cacheTTL  time.Duration
+	cert      *x509.Certificate
+	pem       []byte
+	lastFetch time.Time
 }
 
 func NewControllerProvider(certURL, name, namespace string, ttl time.Duration) *ControllerProvider {
@@ -60,7 +60,7 @@ func (p *ControllerProvider) fetch(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	
+
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {

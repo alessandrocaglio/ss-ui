@@ -12,7 +12,7 @@ You can run `ss-ui` seamlessly on your local machine using either Podman or Dock
 
 ### Option 1: Running with Podman (Recommended for Linux/Red Hat)
 
-By default, the container will start fresh. You can upload any exported OpenShift certificate `.pem` file directly via the browser UI!
+By default, the container will start fresh. You can upload any public certificate `.pem` file directly via the browser UI!
 
 ```bash
 podman run -d \

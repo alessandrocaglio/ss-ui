@@ -55,7 +55,7 @@ func (s *SealerImpl) Seal(ctx context.Context, req SealRequest, pubKey *rsa.Publ
 		req.Labels = secret.Labels
 		req.Annotations = secret.Annotations
 		req.Type = string(secret.Type)
-		
+
 		if req.Data == nil {
 			req.Data = make(map[string]string)
 		}
@@ -139,7 +139,7 @@ func (s *SealerImpl) Seal(ctx context.Context, req SealRequest, pubKey *rsa.Publ
 			},
 		},
 	}
-	
+
 	// Clean empty maps to avoid noisy YAML output
 	meta := outputFormat["metadata"].(map[string]interface{})
 	if len(req.Labels) == 0 {

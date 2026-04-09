@@ -29,7 +29,7 @@ stringData:
 `
 
 	req := sealer.SealRequest{SecretYaml: rawYaml, Scope: "strict"}
-	
+
 	bytes, _, err := s.Seal(context.Background(), req, &privateKey.PublicKey)
 	if err != nil {
 		t.Fatalf("Seal failed: %v", err)
