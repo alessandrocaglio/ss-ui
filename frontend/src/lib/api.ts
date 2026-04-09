@@ -1,4 +1,4 @@
-import { SealRequest } from "../types/api";
+import type { SealRequest } from "../types/api";
 
 export const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1";
 

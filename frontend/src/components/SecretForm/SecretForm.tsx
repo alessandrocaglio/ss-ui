@@ -23,8 +23,45 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
   const [dockerPass, setDockerPass] = useState("");
   const [dockerRegistry, setDockerRegistry] = useState("https://index.docker.io/v1/");
 
+  const [tlsCert, setTlsCert] = useState("");
+  const [tlsKey, setTlsKey] = useState("");
+
+  const [authUsername, setAuthUsername] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+
+  const [sshKey, setSshKey] = useState("");
+
   // Raw YAML state
   const [rawYaml, setRawYaml] = useState("");
+
+  const hasData = () => {
+    if (type === "Opaque") return kvPairs.some(kv => kv.key || kv.value);
+    if (type === "kubernetes.io/dockerconfigjson") return dockerUser || dockerPass;
+    if (type === "kubernetes.io/tls") return tlsCert || tlsKey;
+    if (type === "kubernetes.io/basic-auth") return authUsername || authPassword;
+    if (type === "kubernetes.io/ssh-auth") return sshKey;
+    return false;
+  };
+
+  const handleTypeChange = (newType: string) => {
+    if (newType === type) return;
+    if (hasData()) {
+      if (!confirm("Changing the secret type will reset the data fields. Do you want to proceed?")) {
+        return;
+      }
+    }
+    // Reset data fields
+    setKvPairs([{ key: "", value: "" }]);
+    setDockerUser("");
+    setDockerPass("");
+    setTlsCert("");
+    setTlsKey("");
+    setAuthUsername("");
+    setAuthPassword("");
+    setSshKey("");
+    
+    setType(newType);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +75,8 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
     }
 
     const data: Record<string, string> = {};
+    const annotations: Record<string, string> = {};
+
     if (type === "Opaque") {
       kvPairs.forEach(kv => {
         if (kv.key) data[kv.key] = kv.value;
@@ -46,10 +85,30 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
       const auth = btoa(`${dockerUser}:${dockerPass}`);
       const cfg = { auths: { [dockerRegistry]: { auth } } };
       data[".dockerconfigjson"] = JSON.stringify(cfg);
+    } else if (type === "kubernetes.io/tls") {
+      if (tlsCert) {
+        if (!tlsCert.trim().startsWith("-----BEGIN CERTIFICATE-----")) {
+          alert("TLS Certificate must start with '-----BEGIN CERTIFICATE-----'");
+          return;
+        }
+        data["tls.crt"] = tlsCert;
+      }
+      if (tlsKey) data["tls.key"] = tlsKey;
+    } else if (type === "kubernetes.io/basic-auth") {
+      if (authUsername) data["username"] = authUsername;
+      if (authPassword) data["password"] = authPassword;
+    } else if (type === "kubernetes.io/ssh-auth") {
+      if (sshKey) {
+        if (!sshKey.trim().startsWith("-----BEGIN")) {
+          alert("SSH Key must start with '-----BEGIN'");
+          return;
+        }
+        data["ssh-privatekey"] = sshKey;
+      }
     }
     
     onGenerate({
-      name, namespace, type, scope, data
+      name, namespace, type, scope, data, annotations
     });
   };
 
@@ -97,9 +156,12 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
 
             <div className="space-y-1">
               <label className="text-sm font-medium">Secret Type</label>
-              <select className="w-full p-2 border rounded text-sm outline-none" value={type} onChange={e=>setType(e.target.value)}>
+              <select className="w-full p-2 border rounded text-sm outline-none" value={type} onChange={e => handleTypeChange(e.target.value)}>
                 <option value="Opaque">Opaque</option>
-                <option value="kubernetes.io/dockerconfigjson">Docker Registration (Image Pull)</option>
+                <option value="kubernetes.io/dockerconfigjson">Image Pull Secret</option>
+                <option value="kubernetes.io/tls">TLS</option>
+                <option value="kubernetes.io/basic-auth">Basic Authentication</option>
+                <option value="kubernetes.io/ssh-auth">SSH Authentication</option>
               </select>
             </div>
 
@@ -128,9 +190,60 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
 
               {type === "kubernetes.io/dockerconfigjson" && (
                 <div className="grid grid-cols-2 gap-3">
-                  <input required className="col-span-2 p-2 border rounded text-sm" placeholder="Registry (e.g. docker.io)" value={dockerRegistry} onChange={e=>setDockerRegistry(e.target.value)} />
+                  <input required className="col-span-2 p-2 border rounded text-sm" placeholder="Registry (e.g. https://index.docker.io/v1/)" value={dockerRegistry} onChange={e=>setDockerRegistry(e.target.value)} />
                   <input required className="p-2 border rounded text-sm" placeholder="Username" value={dockerUser} onChange={e=>setDockerUser(e.target.value)} />
                   <input required type="password" className="p-2 border rounded text-sm" placeholder="Password" value={dockerPass} onChange={e=>setDockerPass(e.target.value)} />
+                </div>
+              )}
+
+              {type === "kubernetes.io/tls" && (
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground uppercase">TLS Certificate (tls.crt)</label>
+                    <textarea 
+                      required 
+                      className="w-full text-xs font-mono p-2 border rounded h-24 focus:ring-1 outline-none" 
+                      placeholder="-----BEGIN CERTIFICATE-----" 
+                      value={tlsCert}
+                      onChange={e => setTlsCert(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground uppercase">TLS Key (tls.key)</label>
+                    <textarea 
+                      required 
+                      className="w-full text-xs font-mono p-2 border rounded h-24 focus:ring-1 outline-none" 
+                      placeholder="-----BEGIN RSA PRIVATE KEY-----" 
+                      value={tlsKey}
+                      onChange={e => setTlsKey(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {type === "kubernetes.io/basic-auth" && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground uppercase">Username</label>
+                    <input required className="w-full p-2 border rounded text-sm outline-none focus:ring-1" value={authUsername} onChange={e=>setAuthUsername(e.target.value)} />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground uppercase">Password</label>
+                    <input required type="password" className="w-full p-2 border rounded text-sm outline-none focus:ring-1" value={authPassword} onChange={e=>setAuthPassword(e.target.value)} />
+                  </div>
+                </div>
+              )}
+
+              {type === "kubernetes.io/ssh-auth" && (
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground uppercase">SSH Private Key (ssh-privatekey)</label>
+                  <textarea 
+                    required 
+                    className="w-full text-xs font-mono p-2 border rounded h-32 focus:ring-1 outline-none" 
+                    placeholder="-----BEGIN OPENSSH PRIVATE KEY-----" 
+                    value={sshKey}
+                    onChange={e => setSshKey(e.target.value)}
+                  />
                 </div>
               )}
             </div>
