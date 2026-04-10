@@ -18,11 +18,19 @@ type Config struct {
 	AllowedOrigins      string
 	KubeconfigPath      string
 	LogLevel            string
+	Insecure            bool
 }
 
 func getEnv(key, defaultVal string) string {
 	if val := os.Getenv(key); val != "" {
 		return val
+	}
+	return defaultVal
+}
+
+func getEnvBool(key string, defaultVal bool) bool {
+	if val := os.Getenv(key); val != "" {
+		return val == "true" || val == "1" || val == "yes"
 	}
 	return defaultVal
 }
@@ -51,6 +59,7 @@ func LoadConfig() *Config {
 	flag.StringVar(&cfg.AllowedOrigins, "allowed-origins", getEnv("ALLOWED_ORIGINS", "*"), "CORS allowed origins (comma separated)")
 	flag.StringVar(&cfg.KubeconfigPath, "kubeconfig", getEnv("KUBECONFIG", ""), "Path to kubeconfig file")
 	flag.StringVar(&cfg.LogLevel, "log-level", getEnv("LOG_LEVEL", "info"), "Log level (debug, info, warn, error)")
+	flag.BoolVar(&cfg.Insecure, "insecure", getEnvBool("INSECURE", false), "Allow revealing secret values in the UI (Insecure mode)")
 
 	flag.Parse()
 

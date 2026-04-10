@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 export function useSeal() {
   const [sealResult, setSealResult] = useState<SealResponse | null>(null);
+  const [lastRequest, setLastRequest] = useState<SealRequest | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,6 +15,7 @@ export function useSeal() {
     try {
       const res = await sealSecret(req);
       setSealResult(res);
+      setLastRequest(req);
       toast.success("Sealed Secret generated successfully");
     } catch (err: unknown) {
       const apiErr = err as ApiError;
@@ -24,5 +26,5 @@ export function useSeal() {
     }
   };
 
-  return { sealResult, loading, error, seal };
+  return { sealResult, lastRequest, loading, error, seal };
 }

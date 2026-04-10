@@ -1,5 +1,12 @@
 export type CertSource = "controller" | "file" | "upload" | "none";
 
+export interface HealthResponse {
+  status: string;
+  version: string;
+  certSource: CertSource;
+  insecure: boolean;
+}
+
 export interface CertInfo {
   source: CertSource;
   pem: string;

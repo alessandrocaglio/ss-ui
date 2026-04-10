@@ -41,6 +41,7 @@ All configurations are managed via `values.yaml`. You can override them using `-
 | `env.controllerNamespace` | Namespace of Sealed Secrets controller | `kube-system` |
 | `env.controllerName` | Service name of Sealed Secrets controller | `sealed-secrets` |
 | `env.allowedOrigins` | CORS policy for API | `*` |
+| `env.insecure` | Enable Secret Reveal / Insecure mode | `false` |
 | `resources.limits.memory` | Memory limit for the backend | `128Mi` |
 
 ### Advanced: Targeting a non-standard Controller
@@ -93,7 +94,7 @@ If you prefer to run a single binary without any container runtime, you can down
 
 Example:
 ```bash
-ss-ui --cert-file dev/test-cert.pem --port=9090
+ss-ui --cert-file dev/test-cert.pem --port=9090 --insecure
 ```
 
 **Full Help Output:**
@@ -111,6 +112,8 @@ Usage of ss-ui:
     	Name of the in-cluster sealed-secrets service (default "sealed-secrets")
   -controller-namespace string
     	Namespace of the in-cluster sealed-secrets service (default "kube-system")
+  -insecure
+    	Allow revealing secret values in the UI (Insecure mode)
   -kubeconfig string
     	Path to kubeconfig file
   -log-level string
@@ -130,6 +133,8 @@ Usage of ss-ui:
 ## 🌟 Application Features & Usage
 
 *   **Zero-State Security Model**: Secrets are instantly processed, structured, and wiped. Uploaded PEM certificates never touch the disk and live entirely in-memory.
+*   **Insecure Mode / Reveal Values**: Gated behind the `--insecure` flag, this feature allows you to toggle the visibility of sensitive data (passwords, keys) during construction.
+*   **Equivalent CLI Command**: Automatically generates a copy-and-pasteable `kubectl | kubeseal` command that reproduces your UI actions. The command intelligently reflects your active reveal status and certificate source.
 *   **Customizable Metadata**: Add arbitrary Kubernetes labels and annotations to any secret via dynamic key-value builders in the UI.
 *   **GitOps Toggle Logic**: This is the format used in the [Red Hat COP Sealed Secret Helper](https://github.com/hhellbusch/redhat-cop-helm-charts/tree/main/charts/helper-sealed-secrets) 
 *   **Raw YAML Fallbacks**: Need to port over huge chunks of old code? Paste native unencrypted Kubernetes `kind: Secret` YAMLs right into the dashboard and let the frontend automatically parse and safely bridge them for you directly on the fly.
