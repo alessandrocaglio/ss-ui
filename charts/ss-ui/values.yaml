@@ -53,6 +53,7 @@ env:
   controllerNamespace: "kube-system"
   controllerName: "sealed-secrets"
   allowedOrigins: "*"
+  insecure: false
 
 resources:
   limits:

@@ -42,6 +42,10 @@ spec:
               value: {{ .Values.env.controllerName | quote }}
             - name: ALLOWED_ORIGINS
               value: {{ .Values.env.allowedOrigins | quote }}
+            {{- if .Values.env.insecure }}
+            - name: INSECURE
+              value: {{ .Values.env.insecure | quote }}
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /api/v1/health
