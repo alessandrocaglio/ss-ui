@@ -1,14 +1,17 @@
 import { useState } from "react";
 import type { SealRequest } from "../../types/api";
-import { ChevronDown, ChevronRight, X, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, X, Plus, Eye, EyeOff } from "lucide-react";
 
 interface Props {
   onGenerate: (req: SealRequest) => void;
   loading: boolean;
   disabled: boolean;
+  isInsecure: boolean;
+  showValues: boolean;
+  onToggleShowValues: () => void;
 }
 
-export function SecretForm({ onGenerate, loading, disabled }: Props) {
+export function SecretForm({ onGenerate, loading, disabled, isInsecure, showValues, onToggleShowValues }: Props) {
   const [tab, setTab] = useState<"form" | "yaml">("form");
   
   // Form State
@@ -241,7 +244,19 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
             </div>
 
             <div className="p-3 bg-muted/30 border rounded space-y-3">
-              <h4 className="text-sm font-semibold">Data</h4>
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-semibold">Data</h4>
+                {isInsecure && (
+                  <button 
+                    type="button" 
+                    onClick={onToggleShowValues}
+                    className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {showValues ? <EyeOff size={14} /> : <Eye size={14} />}
+                    {showValues ? "Mask Values" : "Reveal Values"}
+                  </button>
+                )}
+              </div>
               {type === "Opaque" && (
                 <div className="space-y-2">
                   {kvPairs.map((kv, i) => (
@@ -251,7 +266,7 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
                         newKv[i].key = e.target.value;
                         setKvPairs(newKv);
                       }} />
-                      <input type="password" className="flex-1 p-2 border rounded text-sm" placeholder="Value" value={kv.value} onChange={e => {
+                      <input type={showValues ? "text" : "password"} className="flex-1 p-2 border rounded text-sm" placeholder="Value" value={kv.value} onChange={e => {
                         const newKv = [...kvPairs];
                         newKv[i].value = e.target.value;
                         setKvPairs(newKv);
@@ -267,7 +282,7 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
                 <div className="grid grid-cols-2 gap-3">
                   <input required className="col-span-2 p-2 border rounded text-sm" placeholder="Registry (e.g. https://index.docker.io/v1/)" value={dockerRegistry} onChange={e=>setDockerRegistry(e.target.value)} />
                   <input required className="p-2 border rounded text-sm" placeholder="Username" value={dockerUser} onChange={e=>setDockerUser(e.target.value)} />
-                  <input required type="password" className="p-2 border rounded text-sm" placeholder="Password" value={dockerPass} onChange={e=>setDockerPass(e.target.value)} />
+                  <input required type={showValues ? "text" : "password"} className="p-2 border rounded text-sm" placeholder="Password" value={dockerPass} onChange={e=>setDockerPass(e.target.value)} />
                 </div>
               )}
 
@@ -289,6 +304,7 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
                       required 
                       className="w-full text-xs font-mono p-2 border rounded h-24 focus:ring-1 outline-none" 
                       placeholder="-----BEGIN RSA PRIVATE KEY-----" 
+                      style={{ WebkitTextSecurity: showValues ? 'none' : 'disc' } as React.CSSProperties}
                       value={tlsKey}
                       onChange={e => setTlsKey(e.target.value)}
                     />
@@ -304,7 +320,7 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-medium text-muted-foreground uppercase">Password</label>
-                    <input required type="password" className="w-full p-2 border rounded text-sm outline-none focus:ring-1" value={authPassword} onChange={e=>setAuthPassword(e.target.value)} />
+                    <input required type={showValues ? "text" : "password"} className="w-full p-2 border rounded text-sm outline-none focus:ring-1" value={authPassword} onChange={e=>setAuthPassword(e.target.value)} />
                   </div>
                 </div>
               )}
@@ -316,6 +332,7 @@ export function SecretForm({ onGenerate, loading, disabled }: Props) {
                     required 
                     className="w-full text-xs font-mono p-2 border rounded h-32 focus:ring-1 outline-none" 
                     placeholder="-----BEGIN OPENSSH PRIVATE KEY-----" 
+                    style={{ WebkitTextSecurity: showValues ? 'none' : 'disc' } as React.CSSProperties}
                     value={sshKey}
                     onChange={e => setSshKey(e.target.value)}
                   />

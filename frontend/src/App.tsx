@@ -1,17 +1,23 @@
+import { useState } from "react";
 import { Toaster } from "sonner";
 import { useCert } from "./hooks/useCert";
 import { useSeal } from "./hooks/useSeal";
 import { useTheme } from "./hooks/useTheme";
+import { useHealth } from "./hooks/useHealth";
 import { CertificatePanel } from "./components/CertificatePanel/CertificatePanel";
 import { SecretForm } from "./components/SecretForm/SecretForm";
 import { YamlPreview } from "./components/YamlPreview/YamlPreview";
 import { SunIcon, MoonIcon } from "lucide-react";
 
 export default function App() {
+  const { health } = useHealth();
   const { certInfo, loading: certLoading, switchSource, uploadCertText } = useCert();
-  const { sealResult, loading: sealLoading, seal } = useSeal();
+  const { sealResult, lastRequest, loading: sealLoading, seal } = useSeal();
   const { theme, toggleTheme } = useTheme();
+  
+  const [showValues, setShowValues] = useState(false);
 
+  const isInsecure = !!health?.insecure;
   const isCertDisabled = certLoading || (!certInfo || certInfo.source === "none");
 
   return (
@@ -43,6 +49,9 @@ export default function App() {
             onGenerate={seal} 
             loading={sealLoading} 
             disabled={isCertDisabled} 
+            isInsecure={isInsecure}
+            showValues={showValues}
+            onToggleShowValues={() => setShowValues(!showValues)}
           />
         </div>
 
@@ -50,8 +59,11 @@ export default function App() {
         <div className="w-full lg:flex-1 h-[600px] lg:h-[calc(100vh-8rem)] min-h-[500px]">
           <YamlPreview 
             sealResult={sealResult}
+            lastRequest={lastRequest}
+            certInfo={certInfo}
             loading={sealLoading}
             theme={theme}
+            showValues={showValues}
           />
         </div>
       </main>

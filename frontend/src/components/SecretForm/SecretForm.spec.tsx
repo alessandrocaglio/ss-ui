@@ -6,7 +6,7 @@ describe('SecretForm', () => {
   const mockOnGenerate = vi.fn();
 
   it('renders correctly with default values', () => {
-    render(<SecretForm onGenerate={mockOnGenerate} loading={false} disabled={false} />);
+    render(<SecretForm onGenerate={mockOnGenerate} loading={false} disabled={false} isInsecure={false} showValues={false} onToggleShowValues={() => {}} />);
     
     expect(screen.getByText('Form Builder')).toBeInTheDocument();
     expect(screen.getByText('Raw Secret YAML')).toBeInTheDocument();
@@ -15,7 +15,7 @@ describe('SecretForm', () => {
   });
 
   it('switches between Form and Raw YAML tabs', () => {
-    render(<SecretForm onGenerate={mockOnGenerate} loading={false} disabled={false} />);
+    render(<SecretForm onGenerate={mockOnGenerate} loading={false} disabled={false} isInsecure={false} showValues={false} onToggleShowValues={() => {}} />);
     
     const yamlTab = screen.getByText('Raw Secret YAML');
     fireEvent.click(yamlTab);
@@ -30,7 +30,7 @@ describe('SecretForm', () => {
   });
 
   it('updates name and namespace fields', () => {
-    render(<SecretForm onGenerate={mockOnGenerate} loading={false} disabled={false} />);
+    render(<SecretForm onGenerate={mockOnGenerate} loading={false} disabled={false} isInsecure={false} showValues={false} onToggleShowValues={() => {}} />);
     
     const nameInput = screen.getByPlaceholderText('my-secret') as HTMLInputElement;
     const nsInput = screen.getByPlaceholderText('default') as HTMLInputElement;
@@ -43,7 +43,7 @@ describe('SecretForm', () => {
   });
 
   it('renders metadata extras section when toggled', () => {
-    render(<SecretForm onGenerate={mockOnGenerate} loading={false} disabled={false} />);
+    render(<SecretForm onGenerate={mockOnGenerate} loading={false} disabled={false} isInsecure={false} showValues={false} onToggleShowValues={() => {}} />);
     
     const toggleButton = screen.getByText('Labels & Annotations');
     fireEvent.click(toggleButton);
@@ -51,5 +51,46 @@ describe('SecretForm', () => {
     expect(screen.getByText('Labels')).toBeInTheDocument();
     expect(screen.getByText('Annotations')).toBeInTheDocument();
     expect(screen.getByText('Add Label')).toBeInTheDocument();
+  });
+
+  it('handles insecure mode and value toggling', () => {
+    const onToggle = vi.fn();
+    const { rerender } = render(
+      <SecretForm 
+        onGenerate={mockOnGenerate} 
+        loading={false} 
+        disabled={false} 
+        isInsecure={true} 
+        showValues={false} 
+        onToggleShowValues={onToggle} 
+      />
+    );
+    
+    // Check reveal button exists
+    const revealBtn = screen.getByText('Reveal Values');
+    expect(revealBtn).toBeInTheDocument();
+
+    // Check password field is masked
+    const valInput = screen.getAllByPlaceholderText('Value')[0] as HTMLInputElement;
+    expect(valInput.type).toBe('password');
+
+    // Click reveal
+    fireEvent.click(revealBtn);
+    expect(onToggle).toHaveBeenCalled();
+
+    // Re-render with showValues true
+    rerender(
+      <SecretForm 
+        onGenerate={mockOnGenerate} 
+        loading={false} 
+        disabled={false} 
+        isInsecure={true} 
+        showValues={true} 
+        onToggleShowValues={onToggle} 
+      />
+    );
+
+    expect(valInput.type).toBe('text');
+    expect(screen.getByText('Mask Values')).toBeInTheDocument();
   });
 });
