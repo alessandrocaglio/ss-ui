@@ -5,6 +5,8 @@ export interface HealthResponse {
   version: string;
   certSource: CertSource;
   insecure: boolean;
+  controllerNamespace?: string;
+  controllerName?: string;
 }
 
 export interface CertInfo {

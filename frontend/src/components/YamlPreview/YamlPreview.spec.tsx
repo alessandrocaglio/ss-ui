@@ -112,4 +112,44 @@ describe('YamlPreview', () => {
     // Should contain actual value
     expect(screen.getByText(/--from-literal=password='super-secret-value'/)).toBeInTheDocument();
   });
+
+  it('uses custom controller namespace and name in CLI command', () => {
+    const mockRequest = {
+      name: 'my-secret',
+      namespace: 'test-ns',
+      type: 'Opaque',
+      data: { 'k1': 'v1' },
+      scope: 'strict' as const,
+    };
+
+    const mockCert = {
+      source: 'controller' as const,
+      pem: '...',
+      fingerprint: '...',
+      expiresAt: '...',
+      availableSources: ['controller' as const]
+    };
+
+    render(
+      <YamlPreview 
+        sealResult={mockSealResult} 
+        lastRequest={mockRequest} 
+        certInfo={mockCert} 
+        loading={false} 
+        theme="light" 
+        showValues={false}
+        controllerNamespace="custom-ns"
+        controllerName="custom-controller"
+      />
+    );
+
+    // Expand CLI section
+    const toggleBtn = screen.getByText('Equivalent CLI Command');
+    fireEvent.click(toggleBtn);
+
+    // Should contain custom namespace and name
+    const cmdText = screen.getByText(/kubeseal/).textContent;
+    expect(cmdText).toContain('--controller-name=custom-controller');
+    expect(cmdText).toContain('--controller-namespace=custom-ns');
+  });
 });

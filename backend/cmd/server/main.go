@@ -57,7 +57,7 @@ func main() {
 	slr := sealer.NewSealer()
 
 	// Handlers
-	healthH := handler.NewHealthHandler(manager, cfg.Insecure)
+	healthH := handler.NewHealthHandler(manager, cfg.Insecure, cfg.ControllerNamespace, cfg.ControllerName)
 	certH := handler.NewCertHandler(manager)
 	uploadH := handler.NewCertUploadHandler(manager)
 	sealH := handler.NewSealHandler(manager, slr)

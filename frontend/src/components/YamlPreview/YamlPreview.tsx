@@ -11,9 +11,20 @@ interface Props {
   loading: boolean;
   theme: string;
   showValues: boolean;
+  controllerNamespace?: string;
+  controllerName?: string;
 }
 
-export function YamlPreview({ sealResult, lastRequest, certInfo, loading, theme, showValues }: Props) {
+export function YamlPreview({ 
+  sealResult, 
+  lastRequest, 
+  certInfo, 
+  loading, 
+  theme, 
+  showValues,
+  controllerNamespace = "kube-system",
+  controllerName = "sealed-secrets" 
+}: Props) {
   const [format, setFormat] = useState<"sealed" | "gitops">("sealed");
   const [copiedCmd, setCopiedCmd] = useState(false);
   const [showCli, setShowCli] = useState(false);
@@ -100,7 +111,7 @@ export function YamlPreview({ sealResult, lastRequest, certInfo, loading, theme,
     // Add cert/controller info
     if (certInfo) {
       if (certInfo.source === "controller") {
-        cmd += ` \\\n  --controller-name=sealed-secrets \\\n  --controller-namespace=kube-system`;
+        cmd += ` \\\n  --controller-name=${controllerName} \\\n  --controller-namespace=${controllerNamespace}`;
       } else {
         cmd += ` \\\n  --cert cert.pem`;
       }

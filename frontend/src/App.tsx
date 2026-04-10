@@ -64,6 +64,8 @@ export default function App() {
             loading={sealLoading}
             theme={theme}
             showValues={showValues}
+            controllerNamespace={health?.controllerNamespace}
+            controllerName={health?.controllerName}
           />
         </div>
       </main>
